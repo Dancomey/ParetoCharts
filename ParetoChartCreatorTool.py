@@ -10,7 +10,7 @@ import json
 import random
 
 
-def CreatePareto(df, column_name, axis_label, chart_title):
+def CreatePareto(df, column_name, axis_label, chart_title, file_name):
     #sorting the values of the dataframe in descending order
     df.sort_values(by= column_name, ascending= False, inplace= True)
 
@@ -55,36 +55,50 @@ def CreatePareto(df, column_name, axis_label, chart_title):
 
     ax2.axhline(y=0.8, color='red', linestyle='--')
 
-    plt.savefig("CustomChart2.png")
+    plt.savefig(file_name)
+    print("chart created: " + file_name)
+
+user_data = input("Please enter data in dictionary form: ")
+column_name = input("Please enter the column name: ")
+axis_label = input("Please enter the axis label: ")
+chart_title = input("Please enter the chart title: ")
+dict_data = json.loads(user_data)
+
+# column_name = "SumTotal"
+# axis_label = "Sales (units)"
+# chart_title = "Test with grocery store data"
 
 
-
-# user_data = input("Please enter data in dictionary form: ")
-# column_name = input("Please enter the column name: ")
-# axis_label = input("Please enter the axis label: ")
-# chart_title = input("Please enter the chart title: ")
-
-column_name = "State_Sales"
-axis_label = "Sales ($)"
-chart_title = "Test with random data"
-
-# dict_data = json.loads(user_data)
-
-dict_data = test_data = {
-    "Arkansas": random.randint(1, 100),
-    "Texas": random.randint(1, 100),
-    "Maine": random.randint(1, 100),
-    "Georgia": random.randint(1, 100),
-    "Alaska": random.randint(1, 100),
-    "Florida": random.randint(1, 100),
-    "Vermont": random.randint(1, 100)
-}
+# dict_data = test_data = {
+#     "Arkansas": random.randint(1, 100),
+#     "Texas": random.randint(1, 100),
+#     "Maine": random.randint(1, 100),
+#     "Georgia": random.randint(1, 100),
+#     "Alaska": random.randint(1, 100),
+#     "Florida": random.randint(1, 100),
+#     "Vermont": random.randint(1, 100)
+# }
 
 
-#Creating a dataframe with the above dictionary
-df = pd.DataFrame.from_dict(dict_data, orient= "index",columns= [column_name])
+# #Creating a dataframe with the above dictionary
+# df = pd.DataFrame.from_dict(dict_data, orient= "index",columns= [column_name])
 
-CreatePareto(df, column_name, axis_label, chart_title)
+file_path = "/Users/dancomey/Documents/GitHub/ParetoChart/ParetoCharts/GroceriesDataSet.csv"
+
+df = pd.read_csv(file_path)
+
+# Calculate the sum total per group and create a new column
+df['SumTotal'] = df.groupby('Item')['Quantity Sold (kilo)'].transform('sum').astype(int)
+
+columns_to_delete = ['Date', 'Time', 'Item Code', 'Quantity Sold (kilo)', 'Unit Selling Price (RMB/kg)', 'Sale or Return']
+df = df.drop(columns=columns_to_delete)
+
+
+print(df.head())
+
+
+CreatePareto(df, column_name, axis_label, chart_title, "GroceryChart.png")
+
 
 
 
